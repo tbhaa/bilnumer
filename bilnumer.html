@@ -2,7 +2,93 @@
 <html>
 <head>
   <title>Bílnúmer</title>
+  <style>
+    #license-plate-container {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .license-plate-group {
+      display: flex;
+      align-items: center;
+      margin-right: 10px; /* Adjust spacing between groups if desired */
+      padding: 5px;
+      border-radius: 5px;
+      border: 5px solid darkblue;
+      background-color: white;
+      color: darkblue;
+      font-weight: bold;
+      white-space: nowrap;
+      font-family: Verdana, sans-serif;
+    }
+
+    .license-plate-group span {
+      padding-left: 5px;
+      padding-right: 5px;
+    }
+
+    .license-plate-group .spacer {
+      display: inline-block;
+      width: 0.01ch; /* Adjust as needed */
+      height: 0.9em; /* Matches the height of the letters */
+      background-color: lightblue;
+      margin: 0 1px; /* Adjust as needed */
+    }
+  </style>
   <script>
+    /*function getRandomColor() {
+
+      var letters = '0123456789ABCDEF';
+      var color = '#';
+      for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+    }*/
+    function getRandomColor() {
+      var colors = ['yellow', 'pink', 'red', 'blue', 'orange'];
+      var chances = [10, 10, 50, 15, 15];
+      var totalChances = chances.reduce((sum, chance) => sum + chance, 0);
+      var random = Math.floor(Math.random() * totalChances);
+
+      for (var i = 0; i < colors.length; i++) {
+        random -= chances[i];
+        if (random < 0) {
+          return colors[i];
+        }
+      }
+
+      // If no color is selected, return a fallback color
+      return 'pink';
+    }
+    function createChunkElements(chunks) {
+      var container = document.getElementById('license-plate-container');
+
+      // Remove existing container content
+      while (container.firstChild) {
+        container.firstChild.remove();
+      }
+
+      chunks.forEach(function(chunk) {
+        var groupElement = document.createElement('div'); // Add a <div> element for each group
+        groupElement.classList.add('license-plate-group');
+        var lettersElement = document.createElement('span');
+        lettersElement.textContent = chunk.substr(0,3);
+        groupElement.appendChild(lettersElement);
+
+        var spacerElement = document.createElement('span');
+        spacerElement.classList.add('spacer');
+        spacerElement.style.backgroundColor = getRandomColor();
+        groupElement.appendChild(spacerElement);
+
+        var numbersElement = document.createElement('span');
+        numbersElement.textContent = chunk.substr(3,2);
+        groupElement.appendChild(numbersElement);
+
+        container.appendChild(groupElement); // Append the license plate to the container
+      });
+    }
+
     function convertToLeetSpeak() {
       var input = document.getElementById("inputText").value.toUpperCase().replace(/[^A-Z]/g, "");
       var output = "";
@@ -29,8 +115,6 @@
       while (input.length > 0) {
         chunk = input.substr(0, 3);
         numbers = input.substr(3, 2);
-        console.log(chunk);
-        console.log(numbers);
 
         if (numbers.length == 0) {
           // not enough characters left to do the thing, pad with O's and 0's
@@ -40,31 +124,31 @@
             output += "O";
           }
           output += "00"
-          document.getElementById("list").innerHTML = output;
-          return;
-        }
-
-        if (numbers[0] in leetPattern &&
-            numbers[1] in leetPattern) {
-          // happy path, both are leet
-          output += chunk + leetPattern[numbers[0]][0] + leetPattern[numbers[1]][0];
-          output += " ";
-          input = input.substr(5, input.length);
+          input = "";
         } else {
-          if (numbers[0] in leetPattern) {
-            // first letter is leet and a vowel
-            output += chunk + leetPattern[numbers[0]][0] + leetPattern[numbers[0]][0];
+          if (numbers[0] in leetPattern &&
+              numbers[1] in leetPattern) {
+            // happy path, both are leet
+            output += chunk + leetPattern[numbers[0]][0] + leetPattern[numbers[1]][0];
             output += " ";
-            input = input.substr(4, input.length);
+            input = input.substr(5, input.length);
           } else {
-            output += chunk + '00';
-            output += " ";
-            input = input.substr(3, input.length);
+            if (numbers[0] in leetPattern) {
+              // first letter is leet and a vowel
+              output += chunk + leetPattern[numbers[0]][0] + leetPattern[numbers[0]][0];
+              output += " ";
+              input = input.substr(4, input.length);
+            } else {
+              output += chunk + '00';
+              output += " ";
+              input = input.substr(3, input.length);
+            }
           }
         }
       }
-//todo: geyma output í array af converted chunks frekar en streng, uppá að rendera svo chunkana sem bílnúmer með css eða eitthvað
-      document.getElementById("list").innerHTML = output;
+
+      var chunks = output.split(' ');
+      createChunkElements(chunks);
     }
   </script>
 </head>
@@ -76,6 +160,6 @@
   <button onclick="convertToLeetSpeak()">Submit</button>
   <br>
   <label for="outputText">Bílnúmer sem þarf til:</label>
-  <div id="list"></div>
+  <div id="license-plate-container"></div>
 </body>
 </html>
