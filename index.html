@@ -73,7 +73,7 @@
         var groupElement = document.createElement('div'); // Add a <div> element for each group
         groupElement.classList.add('license-plate-group');
         var lettersElement = document.createElement('span');
-        lettersElement.textContent = chunk.substr(0,3);
+        lettersElement.textContent = chunk.substr(0,2);
         groupElement.appendChild(lettersElement);
 
         var spacerElement = document.createElement('span');
@@ -82,7 +82,7 @@
         groupElement.appendChild(spacerElement);
 
         var numbersElement = document.createElement('span');
-        numbersElement.textContent = chunk.substr(3,2);
+        numbersElement.textContent = chunk.substr(2,3);
         groupElement.appendChild(numbersElement);
 
         container.appendChild(groupElement); // Append the license plate to the container
